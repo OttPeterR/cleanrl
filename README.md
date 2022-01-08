@@ -1,118 +1,133 @@
 # CleanRL (Clean Implementation of RL Algorithms)
 
-### This project is WIP currently at 0.1 release, expect breaking changes.
+<img src="
+https://img.shields.io/github/license/vwxyzjn/cleanrl">
+[![tests](https://github.com/vwxyzjn/cleanrl/actions/workflows/tests.yaml/badge.svg)](https://github.com/vwxyzjn/cleanrl/actions/workflows/tests.yaml)
+[![ci](https://github.com/vwxyzjn/cleanrl/actions/workflows/docs.yaml/badge.svg)](https://github.com/vwxyzjn/cleanrl/actions/workflows/docs.yaml)
+[<img src="https://img.shields.io/discord/767863440248143916?label=discord">](https://discord.gg/D6RCjA6sVT)
+[<img src="https://badge.fury.io/py/cleanrl.svg">](
+https://pypi.org/project/cleanrl/)
+[<img src="https://img.shields.io/youtube/channel/views/UCDdC6BIFRI0jvcwuhi3aI6w?style=social">](https://www.youtube.com/channel/UCDdC6BIFRI0jvcwuhi3aI6w/videos)
 
-This repository focuses on a clean and minimal implementation of reinforcement learning algorithms that focuses on easy experimental research. The highlight features of this repo are:
 
-* Most algorithms are self-contained in single files with a common dependency file [common.py](https://github.com/vwxyzjn/cleanrl/blob/master/cleanrl/common.py) that handles different gym spaces.
+CleanRL is a Deep Reinforcement Learning library that provides high-quality single-file implementation with research-friendly features. The implementation is clean and simple, yet we can scale it to run thousands of experiments using AWS Batch. The highlight features of CleanRL are:
 
-* Easy logging of training processes using Tensorboard and Integration with wandb.com to log experiments on the cloud. Check out https://cleanrl.costa.sh.
 
-* **Hackable** and being able to debug *directly* in Python’s interactive shell (Especially if you use the Spyder editor from Anaconda :) ).
 
-* Convenient use of commandline arguments for hyper-parameters tuning.
+* 📜 Single-file implementation
+   * *Every detail about an algorithm is put into the algorithm's own file.* It is therefore easier to fully understand an algorithm and do research with.
+* 📊 Benchmarked Implementation (7+ algorithms and 34+ games at https://benchmark.cleanrl.dev)
+* 📈 Tensorboard Logging
+* 🪛 Local Reproducibility via Seeding
+* 🎮 Videos of Gameplay Capturing
+* 🧫 Experiment Management with [Weights and Biases](https://wandb.ai/site)
+* 💸 Cloud Integration with docker and AWS 
 
-* Benchmarked in many types of games. https://cleanrl.costa.sh
+You can read more about CleanRL in our [technical paper]((https://arxiv.org/abs/2111.08819)) and [documentation](https://docs.cleanrl.dev/).
 
-![wandb.png](wandb.png)
+Good luck have fun :rocket:
 
 ## Get started
+
+Prerequisites:
+* Python 3.8+
+* [Poetry](https://python-poetry.org)
 
 To run experiments locally, give the following a try:
 
 ```bash
-$ git clone https://github.com/vwxyzjn/cleanrl.git && cd cleanrl
-$ pip install -e .
-$ cd cleanrl
-$ python a2c.py \
+git clone https://github.com/vwxyzjn/cleanrl.git && cd cleanrl
+poetry install
+
+# alternatively, you could use `poetry shell` and do
+# `python run cleanrl/ppo.py`
+poetry run python cleanrl/ppo.py \
     --seed 1 \
     --gym-id CartPole-v0 \
-    --total-timesteps 50000 \
+    --total-timesteps 50000
+
 # open another temrminal and enter `cd cleanrl/cleanrl`
-$ tensorboard --logdir runs
+tensorboard --logdir runs
 ```
 
-![demo.gif](demo.gif)
-
-To use wandb integration, sign up an account at https://wandb.com and copy the API key.
-Then run
-
+To use experiment tracking with wandb, run
 ```bash
-$ cd cleanrl
-$ pip install wandb
-$ wandb login ${WANBD_API_KEY}
-$ python a2c.py \
+wandb login # only required for the first time
+poetry run python cleanrl/ppo.py \
     --seed 1 \
     --gym-id CartPole-v0 \
     --total-timesteps 50000 \
-    --prod-mode True \
-    --wandb-project-name cleanrltest 
-# Then go to https://app.wandb.ai/${WANDB_USERNAME}/cleanrltest/
+    --track \
+    --wandb-project-name cleanrltest
 ```
 
-Checkout the demo sites at [https://app.wandb.ai/costa-huang/cleanrltest](https://app.wandb.ai/costa-huang/cleanrltest)
+To run training scripts in other games:
+```
+poetry shell
 
-![demo2.gif](demo2.gif)
+# classic control
+python cleanrl/dqn.py --gym-id CartPole-v1
+python cleanrl/ppo.py --gym-id CartPole-v1
+python cleanrl/c51.py --gym-id CartPole-v1
 
-## User's Guide for Researcher (Please read this if consider using CleanRL)
+# atari
+poetry install -E atari
+python cleanrl/dqn_atari.py --gym-id BreakoutNoFrameskip-v4
+python cleanrl/c51_atari.py --gym-id BreakoutNoFrameskip-v4
+python cleanrl/ppo_atari.py --gym-id BreakoutNoFrameskip-v4
+python cleanrl/apex_dqn_atari.py --gym-id BreakoutNoFrameskip-v4
 
-CleanRL focuses on early and mid stages of RL research, where one would try to understand ideas and do hacky experimentation with the algorithms. If your goal does not include messing with different parts of RL algorithms, perhaps library like [stable-baselines](https://github.com/hill-a/stable-baselines), [ray](https://github.com/ray-project/ray), or [catalyst](https://github.com/catalyst-team/catalyst) would be more suited for your use cases since they are built to be highly optimized, concurrent and fast.
+# pybullet
+poetry install -E pybullet
+python cleanrl/td3_continuous_action.py --gym-id MinitaurBulletDuckEnv-v0
+python cleanrl/ddpg_continuous_action.py --gym-id MinitaurBulletDuckEnv-v0
+python cleanrl/sac_continuous_action.py --gym-id MinitaurBulletDuckEnv-v0
 
-CleanRL, however, is built to provide a simplified and streamlined approach to conduct RL experiment. Let's give an example. Say you are interested in implementing the [GAE (Generalized Advantage Estimation) technique](https://arxiv.org/abs/1506.02438) to see if it improves the A2C's performance on `CartPole-v0`. The workflow roughly looks like this:
+# procgen
+poetry install -E procgen
+python cleanrl/ppo_procgen.py --gym-id starpilot
+python cleanrl/ppo_procgen_impala_cnn.py --gym-id starpilot
+python cleanrl/ppg_procgen.py --gym-id starpilot
+python cleanrl/ppg_procgen_impala_cnn.py --gym-id starpilot
+```
 
-1. Make a copy of `cleanrl/cleanrl/a2c.py` to `cleanrl/cleanrl/experiments/a2c_gae.py`
-2. Implement the GAE technique. This should relatively simple because you don't have to navigate into dozens of files and find the some function named `compute_advantages()`
-3. Run `python cleanrl/cleanrl/experiments/a2c_gae.py` in the terminal or using an interactive shell like [Spyder](https://www.spyder-ide.org/). The latter gives you the ability to stop the program at any time and execute arbitrary code; so you can program on the fly.
-4. Open another terminal and type `tensorboard --logdir cleanrl/cleanrl/experiments/runs` and checkout the `episode_rewards`, `losses/policy_loss`, etc. If something appears not right, go to step 2 and continue.
-5. If the technique works, you want to see if it works with other games such as `Taxi-v3` or different parameters as well. Execute 
-    ```
-    $ wandb login ${WANBD_API_KEY}
-    $ for seed in {1..2}
-        do
-            (sleep 0.3 && nohup python a2c_gae.py \
-            --seed $seed \
-            --gym-id CartPole-v0 \
-            --total-timesteps 30000 \
-            --wandb-project-name myRLproject \
-            --prod-mode True
-            ) >& /dev/null &
-        done
-    $ for seed in {1..2}
-        do
-            (sleep 0.3 && nohup python a2c_gae.py \
-            --seed $seed \
-            --gym-id Taxi-v3 \   # different env
-            --total-timesteps 30000 \
-            --gamma 0.8 \ # a lower discount factor
-            --wandb-project-name myRLproject \
-            --prod-mode True
-            ) >& /dev/null &
-        done
-    ```
-    And then you can monitor the performances and keep good track of all the parameters used in your experiments
-6. Continue this process
+You may also use a prebuilt development environment hosted in Gitpod:
 
-This pipline described above should give you an idea of how to use CleanRL for your research.
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vwxyzjn/cleanrl/tree/gitpod)
 
-## Feature TODOs:
+## Algorithms Implemented
+- [x] Deep Q-Learning (DQN)
+- [x] Categorical DQN (C51)
+- [x] Proximal Policy Gradient (PPO) 
+- [x] Soft Actor Critic (SAC)
+- [x] Deep Deterministic Policy Gradient (DDPG)
+- [x] Twin Delayed Deep Deterministic Policy Gradient (TD3)
+- [x] Apex Deep Q-Learning (Apex-DQN)
 
-- [x] Add automatic benchmark 
-    - Completed. See https://app.wandb.ai/costa-huang/cleanrl.benchmark/reports?view=costa-huang%2Fbenchmark
-- [x] Support continuous action spaces
-    - Preliminary support with [a2c_continuous_action.py](https://github.com/vwxyzjn/cleanrl/blob/master/cleanrl/a2c_continuous_action.py)
-- [x] Support using GPU
-- [ ] Support using multiprocessing
+## Open RL Benchmark
 
-## References
+CleanRL has a sub project called Open RL Benchmark (https://benchmark.cleanrl.dev/), where we have tracked thousands of experiments across domains. The benchmark is interactive, and researchers can easily query information such as GPU utilization and videos of an agent's gameplay that are normally hard to acquire in other RL benchmarks. Here are some screenshots.
 
-I have been heavily inspired by the many repos and blog posts. Below contains a incomplete list of them.
+![](docs/static/o2.png)
+![](docs/static/o3.png)
+![](docs/static/o1.png)
 
-* http://inoryy.com/post/tensorflow2-deep-reinforcement-learning/
-* https://github.com/seungeunrho/minimalRL
-* https://github.com/Shmuma/Deep-Reinforcement-Learning-Hands-On
-* https://github.com/hill-a/stable-baselines
 
-The following ones helped me a lot with the continuous action space handling:
+## Support and get involved
 
-* https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail
-* https://github.com/zhangchuheng123/Reinforcement-Implementation/blob/master/code/ppo.py
+We have a [Discord Community](https://discord.gg/D6RCjA6sVT) for support. Feel free to ask questions. Posting in [Github Issues](https://github.com/vwxyzjn/cleanrl/issues) and PRs are also welcome. Also our past video recordings are available at [YouTube](https://www.youtube.com/watch?v=dm4HdGujpPs&list=PLQpKd36nzSuMynZLU2soIpNSMeXMplnKP&index=2)
+
+## Citing CleanRL
+
+If you use CleanRL in your work, please cite our technical [paper](https://arxiv.org/abs/2111.08819):
+
+```bibtex
+@article{huang2021cleanrl,
+    title={CleanRL: High-quality Single-file Implementations of Deep Reinforcement Learning Algorithms}, 
+    author={Shengyi Huang and Rousslan Fernand Julien Dossa and Chang Ye and Jeff Braga},
+    year={2021},
+    eprint={2111.08819},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```

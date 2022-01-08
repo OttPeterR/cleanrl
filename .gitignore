@@ -1,6 +1,18 @@
+debug.sh.docker.sh
+docker_cache
+rl-video-*.mp4
+rl-video-*.json
+cleanrl_utils/charts_episode_reward
+tutorials
+.DS_Store
 *.tfevents.*
 wandb
-
+openaigym.*
+videos/*
+cleanrl/videos/*
+benchmark/**/*.svg
+benchmark/**/*.pkl
+mjkey.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -75,7 +87,7 @@ target/
 .ipynb_checkpoints
 
 # pyenv
-.python-version
+# .python-version
 
 # celery beat schedule file
 celerybeat-schedule
